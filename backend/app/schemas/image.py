@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class ImageBase(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    fingerprint: Optional[str] = None
 
 
 # Properties to receive on image creation
