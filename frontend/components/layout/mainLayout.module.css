@@ -1,0 +1,18 @@
+.header {
+  position: 'sticky';
+  top: 0;
+  z-index: 1;
+  width: '100%';
+  padding: 0 20px;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header .left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

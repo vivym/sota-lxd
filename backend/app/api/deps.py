@@ -1,7 +1,8 @@
-from typing import Generator
+from typing import Generator, Optional
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.security.utils import get_authorization_scheme_param
 from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
@@ -10,7 +11,24 @@ from app import crud, models, schemas, security
 from app.db.session import SessionLocal
 from app.settings import settings
 
-reusable_oauth2 = OAuth2PasswordBearer(
+
+class OAuth2PasswordBearerInCookie(OAuth2PasswordBearer):
+    async def __call__(self, request: Request) -> Optional[str]:
+        authorization: str = request.cookies.get("access_token")
+        print("authorization", authorization)
+        scheme, param = get_authorization_scheme_param(authorization)
+        if not authorization or scheme.lower() != "bearer":
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Not authenticated",
+                )
+            else:
+                return None
+        return param
+
+
+reusable_oauth2 = OAuth2PasswordBearerInCookie(
     tokenUrl=f"{settings.URL_PREFIX}/login/access-token"
 )
 

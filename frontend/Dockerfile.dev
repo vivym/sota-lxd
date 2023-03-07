@@ -1,0 +1,9 @@
+FROM node:19-alpine AS base
+
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+RUN npm i -g pnpm
+
+CMD ["pnpm", "run", "dev", "--port", "80"]

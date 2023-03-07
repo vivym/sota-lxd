@@ -3,7 +3,8 @@ version: "3.8"
 services:
   proxy:
     ports:
-      - 80:80
+      - 3000:80
+      - 8080:8080
     command:
       # Enable Docker in Traefik, so that it reads labels from Docker services
       - --providers.docker
@@ -49,6 +50,20 @@ services:
       - traefik.constraint-label-stack=${TRAEFIK_TAG?traefik-tag}
       - traefik.http.routers.${STACK_NAME?sota-lxd}-backend-http.rule=PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/redoc`)
       - traefik.http.services.${STACK_NAME?sota-lxd}-backend.loadbalancer.server.port=80
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      args:
+        FRONTEND_ENV: dev
+    volumes:
+      - ./frontend:/app
+    labels:
+      - traefik.enable=true
+      - traefik.constraint-label-stack=${TRAEFIK_TAG?traefik-tag}
+      - traefik.http.routers.${STACK_NAME?sota-lxd}-frontend-http.rule=PathPrefix(`/`)
+      - traefik.http.services.${STACK_NAME?sota-lxd}-frontend.loadbalancer.server.port=80
 
 networks:
   sota-lxd-public:
